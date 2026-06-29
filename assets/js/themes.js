@@ -1,0 +1,3 @@
+const THEMES=[['cosmic-blue','Cosmic Blue'],['neon-mint','Neon Mint'],['royal-purple','Royal Purple'],['solar-gold','Solar Gold'],['emerald-grid','Emerald Grid'],['ruby-night','Ruby Night'],['ocean-glass','Ocean Glass'],['cyber-lime','Cyber Lime'],['amber-noir','Amber Noir'],['ice-silver','Ice Silver']];
+function applyTheme(slug){document.documentElement.dataset.theme=slug;localStorage.setItem('libraryTheme',slug)}
+document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('themeSwitcher');if(s){s.innerHTML=THEMES.map(t=>`<option value="${t[0]}">${t[1]}</option>`).join('');s.value=localStorage.getItem('libraryTheme')||'cosmic-blue';s.onchange=()=>applyTheme(s.value)}applyTheme(localStorage.getItem('libraryTheme')||'cosmic-blue')});
