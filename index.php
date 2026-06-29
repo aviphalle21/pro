@@ -1,0 +1,4 @@
+<?php require_once 'db.php'; app_header('Home'); ?>
+<section class="hero glass"><div><p class="eyebrow">Industrial 3D Library Automation</p><h1>Book your perfect study table in minutes.</h1><p>Choose a table visually, pay through UPI QR, and wait for librarian verification with email updates.</p><div class="actions"><a class="btn" href="register.php">Start Booking</a><a class="btn ghost" href="login.php">Login</a></div></div><div class="cube">📚</div></section>
+<section class="grid3"><article class="card"><h3>Seat-map booking</h3><p>RedBus-style selectable study tables with live availability protection.</p></article><article class="card"><h3>UPI QR payments</h3><p>Dynamic payment QR and transaction verification workflow.</p></article><article class="card"><h3>Approvals</h3><p>Librarians accept or reject bookings with automated professional emails.</p></article></section>
+<?php app_footer(); ?>

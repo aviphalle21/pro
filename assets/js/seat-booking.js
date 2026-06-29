@@ -1,0 +1,2 @@
+document.querySelectorAll('.seat.available').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.seat.selected').forEach(s=>s.classList.remove('selected'));btn.classList.add('selected');document.getElementById('tableId').value=btn.dataset.id;}));
+document.getElementById('bookingForm')?.addEventListener('submit',e=>{if(!document.getElementById('tableId').value){e.preventDefault();alert('Please select an available table.')}});
