@@ -1,1 +1,1 @@
-document.addEventListener('mousemove',e=>{document.documentElement.style.setProperty('--mx',`${e.clientX/window.innerWidth*100}%`);document.documentElement.style.setProperty('--my',`${e.clientY/window.innerHeight*100}%`)});
+document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.card,.btn,.seat').forEach(el=>{el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();el.style.setProperty('--mx',`${e.clientX-r.left}px`);el.style.setProperty('--my',`${e.clientY-r.top}px`);});});});
