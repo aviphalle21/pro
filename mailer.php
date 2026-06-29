@@ -1,21 +1,9 @@
 <?php
 require_once __DIR__ . '/db.php';
-function email_template(string $type, array $data): array {
-    $name = e($data['name'] ?? 'Student');
-    $reason = e($data['reason'] ?? '');
-    $link = e($data['link'] ?? BASE_URL);
-    $templates = [
-        'accepted' => ['Booking Accepted', "<h2>Congratulations, {$name}!</h2><p>Your table booking has been accepted. Your study table is active from {$data['start']} to {$data['expiry']}.</p>"],
-        'rejected' => ['Booking Rejected', "<h2>Hello {$name}</h2><p>Your booking was rejected.</p><p><b>Reason:</b> {$reason}</p>"],
-        'forgot' => ['Password Reset Request', "<h2>Password reset</h2><p>Use this secure link to reset your password: <a href='{$link}'>Reset Password</a></p><p>OTP: <b>" . e($data['otp'] ?? '') . "</b></p>"],
-        'pending' => ['Payment Received - Pending Approval', "<h2>Payment submitted</h2><p>Hi {$name}, your payment transaction ID has been recorded and is pending librarian approval.</p>"],
-    ];
-    return $templates[$type];
-}
-function send_library_mail(?int $userId, string $to, string $subject, string $html): bool {
-    $headers = "MIME-Version: 1.0\r\nContent-type:text/html;charset=UTF-8\r\nFrom: " . PAYEE_NAME . " <" . LIBRARY_EMAIL . ">\r\n";
-    $ok = @mail($to, $subject, $html, $headers);
-    pdo()->prepare('INSERT INTO email_logs(user_id, recipient, subject, body, status, error) VALUES(?,?,?,?,?,?)')->execute([$userId, $to, $subject, $html, $ok?'sent':'queued', $ok?null:'mail() unavailable; configure SMTP in production']);
-    return $ok;
-}
+function render_email(string $title,string $body): string { return '<div style="font-family:Arial;background:#101827;color:#eef;padding:28px"><div style="max-width:640px;margin:auto;background:#ffffff12;border:1px solid #ffffff25;border-radius:18px;padding:24px"><h2>'.e($title).'</h2><p style="line-height:1.7">'.$body.'</p><p>Regards,<br>'.e(PAYEE_NAME).'</p></div></div>'; }
+function send_library_mail(int $userId,string $to,string $subject,string $html): bool { $headers="MIME-Version: 1.0\r\nContent-type:text/html;charset=UTF-8\r\nFrom: ".PAYEE_NAME." <".LIBRARY_EMAIL.">\r\n"; $ok=@mail($to,$subject,$html,$headers); try{ pdo()->prepare('INSERT INTO email_logs(user_id,recipient,subject,body,status,error) VALUES(?,?,?,?,?,?)')->execute([$userId,$to,$subject,$html,$ok?'sent':'queued',$ok?null:'mail() unavailable or SMTP not configured']); }catch(Throwable $e){} return $ok; }
+function email_booking_accepted(array $u,array $b): void { send_library_mail((int)$u['id'],$u['email'],'Booking accepted',render_email('Booking accepted','Your table booking <b>#'.e($b['id']).'</b> is accepted. Start: <b>'.e($b['start_date']).'</b>, Expiry: <b>'.e($b['expiry_date']).'</b>.')); }
+function email_booking_rejected(array $u,array $b,string $reason): void { send_library_mail((int)$u['id'],$u['email'],'Booking rejected',render_email('Booking rejected','Your booking <b>#'.e($b['id']).'</b> was rejected. Reason: <b>'.e($reason).'</b>.')); }
+function email_password_reset(array $u,string $token,string $otp): void { $link=mail_link('reset_password.php',['token'=>$token]); send_library_mail((int)$u['id'],$u['email'],'Password reset',render_email('Password reset','Use OTP <b>'.e($otp).'</b> or open this secure reset link: <a style="color:#7dd3fc" href="'.e($link).'">Reset password</a>. Link expires in 30 minutes.')); }
+function email_payment_pending(array $u,int $bookingId): void { send_library_mail((int)$u['id'],$u['email'],'Payment submitted for verification',render_email('Payment pending confirmation','Your payment for booking <b>#'.e($bookingId).'</b> is pending librarian verification.')); }
 ?>
